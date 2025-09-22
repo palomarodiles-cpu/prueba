@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Narratio · Demo</title>
+  <meta name="description" content="Demo independiente de Narratio (SaaS + API para storytelling verificado).">
+  <!-- Estilos mínimos inline: paleta sobria & #8B1A1A -->
+  <style>
+    :root{
+      --wine:#8B1A1A;
+      --bg:#0f0f10;
+      --panel:#161617;
+      --panel-2:#1c1c1d;
+      --text:#eaeaea;
+      --muted:#b3b3b3;
+      --line:#272729;
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,'Segoe UI',Roboto,sans-serif;
+      color:var(--text);
+      background:linear-gradient(180deg,#0b0b0c 0%,#0e0e10 100%);
+      line-height:1.6;
+    }
+    a{color:inherit;text-decoration:none}
+    .container{width:min(1100px,92vw);margin-inline:auto}
+    .header{position:sticky;top:0;z-index:10;background:rgba(15,15,16,.7);backdrop-filter:saturate(180%) blur(8px);border-bottom:1px solid var(--line)}
+    .nav{display:flex;align-items:center;gap:16px;padding:14px 0}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.3px}
+    .logo{width:20px;height:20px;border-radius:6px;background:var(--wine);box-shadow:0 0 0 4px rgba(139,26,26,.15)}
+    .brand-name{font-size:1.05rem}
+    .hero{padding:84px 0 48px;background:
+      radial-gradient(1200px 300px at 50% -60px, rgba(139,26,26,.30), transparent 60%),
+      linear-gradient(180deg, rgba(139,26,26,.10), transparent 20%)
+    }
+    h1{margin:0 0 10px;font-size:clamp(28px,4vw,48px);letter-spacing:-.3px}
+    .lead{font-size:clamp(16px,2vw,20px);color:var(--muted);max-width:820px}
+    .tabs{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 18px}
+    .tab{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel-2);color:var(--text);cursor:pointer}
+    .tab.active{background:var(--wine);border-color:transparent;color:#fff;font-weight:600}
+    .section{padding:44px 0;border-top:1px solid var(--line)}
+    .card{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+    .muted{color:var(--muted)}
+    .grid{display:grid;gap:20px}
+    .two{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .code{background:#0c0c0d;border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto}
+    footer{border-top:1px solid var(--line);padding:28px 0;background:rgba(15,15,16,.6)}
+    @media (max-width:900px){ .two{grid-template-columns:1fr} }
+  </style>
+
+  <!-- React UMD + Babel (transpila JSX en el navegador; ideal para GitHub Pages sin build) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <header class="header">
+    <div class="container nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <span class="brand-name">Narratio</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>Storytelling verificado, listo para integrar</h1>
+        <p class="lead">SaaS + API que transforma notas, artículos y posts en narrativas auditables con evidencias, trazabilidad y un Trust Score en tiempo real.</p>
+
+        <!-- Tabs -->
+        <div id="tabs"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div id="content"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container muted small">© <span id="year"></span> Narratio — Demo interna.</div>
+  </footer>
+
+  <!-- App React (JSX) -->
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Componente de Tabs
+    function Tabs({value,onChange}){
+      const items = [
+        {id:"pulse", label:"Innovation Pulse"},
+        {id:"traz",  label:"Trazabilidad"},
+        {id:"score", label:"Evaluation & Scoring"},
+        {id:"api",   label:"API"}
+      ];
+      return (
+        <div className="tabs">
+          {items.map(it => (
+            <button
+              key={it.id}
+              className={"tab " + (value===it.id ? "active" : "")}
+              onClick={() => onChange(it.id)}
+              aria-pressed={value===it.id}
+            >
+              {it.label}
+            </button>
+          ))}
+        </div>
+      );
+    }
+
+    // Vistas por pestaña
+    function View({tab}){
+      if(tab==="pulse"){
+        return (
+          <div className="grid two">
+            <div className="card">
+              <h3>Innovation Pulse</h3>
+              <p>
+                Doble scoring integrado: <strong>Trust Score</strong> (API Narratio) + <strong>Engagement Score</strong> (comportamiento real en boletines).
+                El contenido de próximos envíos se adapta a las señales de lectura y clic reales.
+              </p>
+            </div>
+            <div className="card">
+              <h3>Flujo</h3>
+              <ol>
+                <li>Ingesta de fuentes y deduplicación.</li>
+                <li>Verificación semántica y trazabilidad de evidencias.</li>
+                <li>Cálculo de señales de interés (aperturas, clics, tiempo).</li>
+                <li>Curación automática del siguiente boletín.</li>
+              </ol>
+            </div>
+          </div>
+        );
+      }
+      if(tab==="traz"){
+        return (
+          <div className="grid two">
+            <div className="card">
+              <h3>Grafo de evidencias</h3>
+              <p>
+                Relaciona afirmaciones con fuentes, fechas, nivel de confianza y auditoría.
+                Todo con <em>provenance</em> explícita y exportable.
+              </p>
+            </div>
+            <div className="card">
+              <h3>Auditoría</h3>
+              <p>Versionado de verificaciones, responsables, y motivo de cambio (whodunnit).</p>
+            </div>
+          </div>
+        );
+      }
+      if(tab==="score"){
+        return (
+          <div className="grid two">
+            <div className="card">
+              <h3>Trust Score</h3>
+              <p>
+                Métrica nativa de Narratio basada en 5 etapas (análisis semántico, veracidad, trazabilidad,
+                evaluación de confianza y reporte explicable).
+              </p>
+            </div>
+            <div className="card">
+              <h3>Engagement Score</h3>
+              <p>
+                Señales de interacción reales en boletines (aperturas, clics y lectura) para priorizar temas.
+              </p>
+            </div>
+          </div>
+        );
+      }
+      if(tab==="api"){
+        return (
+          <div>
+            <h3>Integración vía API</h3>
+            <pre className="code"><code>
+POST /verify
+Authorization: Bearer &lt;token&gt;
+Content-Type: application/json
+
+{"input":"Texto o URL a verificar","options":{"language":"es"}}
+            </code></pre>
+            <p className="muted">Widgets embebibles para CMS/newsletters y exportables a JSON/PDF.</p>
+          </div>
+        );
+      }
+      return null;
+    }
+
+    function App(){
+      const [tab, setTab] = useState("pulse");
+      useEffect(() => {
+        document.title = "Narratio · Demo";
+        document.getElementById("year").textContent = new Date().getFullYear();
+      }, []);
+      return (
+        <>
+          <Tabs value={tab} onChange={setTab} />
+          <View tab={tab} />
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("tabs")).render(<App />);
+    ReactDOM.createRoot(document.getElementById("content")).render(<View tab="pulse" />);
+  </script>
+</body>
+</html>
